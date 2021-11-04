@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "1",
 				"spark.dynamicAllocation.maxExecutors": "1",
-				"spark.autotune.trackingId": "211540c7-3905-4f9d-a918-64b898eb69ad"
+				"spark.autotune.trackingId": "62faf527-2c0e-4c26-9de2-41a240889003"
 			}
 		},
 		"metadata": {
@@ -25,7 +25,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -66,7 +66,7 @@
 				"source": [
 					"adls_account_name = 'asadatalakecp7unwa'"
 				],
-				"execution_count": null
+				"execution_count": 2
 			},
 			{
 				"cell_type": "markdown",
@@ -85,7 +85,7 @@
 					"# and `inferSchema` instruct Spark to use data within the file to infer data types.\r\n",
 					"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170501.csv', format='csv', header=True, inferSchema=True)"
 				],
-				"execution_count": null
+				"execution_count": 3
 			},
 			{
 				"cell_type": "markdown",
@@ -121,12 +121,13 @@
 							"filter": null
 						},
 						"isSql": false
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"display(df.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 5
 			},
 			{
 				"cell_type": "markdown",
@@ -176,7 +177,8 @@
 							"filter": null
 						},
 						"isSql": false
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"# Create a new data frame containing a list of distinct CustomerId and ProductId values in descending order of the CustomerId.\r\n",
@@ -185,7 +187,7 @@
 					"# Display the first 100 rows of the resulting data frame.\r\n",
 					"display(df_distinct_products.limit(100))"
 				],
-				"execution_count": null
+				"execution_count": 4
 			},
 			{
 				"cell_type": "markdown",
@@ -200,7 +202,7 @@
 					"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv', format='csv')\r\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 7
 			},
 			{
 				"cell_type": "markdown",
@@ -232,7 +234,7 @@
 					"# Read the CSV file into a resilient distributed dataset (RDD) as a text file. This will read each row of the file into rows in an RDD.\r\n",
 					"rdd = sc.textFile(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv')"
 				],
-				"execution_count": null
+				"execution_count": 8
 			},
 			{
 				"cell_type": "markdown",
@@ -250,7 +252,7 @@
 					"# Print out the count of fields read into the array.\r\n",
 					"print(field_count)"
 				],
-				"execution_count": null
+				"execution_count": 11
 			},
 			{
 				"cell_type": "markdown",
@@ -268,7 +270,7 @@
 					"expected_row_count = math.floor(field_count / 11)\r\n",
 					"print(f'The expected row count is: {expected_row_count}')"
 				],
-				"execution_count": null
+				"execution_count": 12
 			},
 			{
 				"cell_type": "markdown",
@@ -298,7 +300,7 @@
 					"\r\n",
 					"print(f'The row array contains {len(row_list)} rows. The expected number of rows was {expected_row_count}.')"
 				],
-				"execution_count": null
+				"execution_count": 13
 			},
 			{
 				"cell_type": "markdown",
@@ -332,14 +334,15 @@
 							"filter": null
 						},
 						"isSql": false
-					}
+					},
+					"collapsed": false
 				},
 				"source": [
 					"# Finally, we can use the row_list we created above to create a DataFrame. We can add to this a schema parameter, which contains the column names we saw in the schema of the first file.\r\n",
 					"df_fixed = spark.createDataFrame(row_list,schema=['TransactionId', 'CustomerId', 'ProductId', 'Quantity', 'Price', 'TotalAmount', 'TransactionDateId', 'ProfitAmount', 'Hour', 'Minute', 'StoreId'])\r\n",
 					"display(df_fixed.limit(10))"
 				],
-				"execution_count": null
+				"execution_count": 14
 			},
 			{
 				"cell_type": "markdown",
@@ -359,7 +362,7 @@
 				"source": [
 					"df_fixed.write.format('csv').option('header',True).mode('overwrite').option('sep',',').save(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502-fixed')"
 				],
-				"execution_count": null
+				"execution_count": 15
 			},
 			{
 				"cell_type": "markdown",
