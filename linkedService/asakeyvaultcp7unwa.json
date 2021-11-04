@@ -1,0 +1,11 @@
+{
+	"name": "asakeyvaultcp7unwa",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://asakeyvaultcp7unwa.vault.azure.net/"
+		}
+	}
+}
