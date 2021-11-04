@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "asaworkspacecp7unwa"
+		},
+		"asadatalakecp7unwa_accountKey": {
+			"value": ""
+		},
+		"asastorecp7unwa_connectionString": {
+			"value": ""
+		},
+		"asaworkspacecp7unwa-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"sqlpool01_connectionString": {
+			"value": ""
+		},
+		"sqlpool01_highperf_connectionString": {
+			"value": ""
+		},
+		"sqlpool01_import01_connectionString": {
+			"value": ""
+		},
+		"sqlpool01_workload01_connectionString": {
+			"value": ""
+		},
+		"sqlpool01_workload02_connectionString": {
+			"value": ""
+		},
+		"asadatalakecp7unwa_properties_typeProperties_url": {
+			"value": "https://asadatalakecp7unwa.dfs.core.windows.net"
+		},
+		"asakeyvaultcp7unwa_properties_typeProperties_baseUrl": {
+			"value": "https://asakeyvaultcp7unwa.vault.azure.net/"
+		},
+		"asaworkspacecp7unwa-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://asadatalakecp7unwa.dfs.core.windows.net"
+		}
+	}
+}

@@ -1,0 +1,1558 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "asaworkspacecp7unwa"
+		},
+		"asadatalakecp7unwa_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'asadatalakecp7unwa'"
+		},
+		"asastorecp7unwa_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'asastorecp7unwa'"
+		},
+		"asaworkspacecp7unwa-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'asaworkspacecp7unwa-WorkspaceDefaultSqlServer'"
+		},
+		"sqlpool01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sqlpool01'"
+		},
+		"sqlpool01_highperf_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sqlpool01_highperf'"
+		},
+		"sqlpool01_import01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sqlpool01_import01'"
+		},
+		"sqlpool01_workload01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sqlpool01_workload01'"
+		},
+		"sqlpool01_workload02_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'sqlpool01_workload02'"
+		},
+		"asadatalakecp7unwa_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asadatalakecp7unwa.dfs.core.windows.net"
+		},
+		"asakeyvaultcp7unwa_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://asakeyvaultcp7unwa.vault.azure.net/"
+		},
+		"asaworkspacecp7unwa-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asadatalakecp7unwa.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQLPool01')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/asadatalakecp7unwa')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('asadatalakecp7unwa_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('asadatalakecp7unwa_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/asakeyvaultcp7unwa')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('asakeyvaultcp7unwa_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/asastorecp7unwa')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('asastorecp7unwa_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/asaworkspacecp7unwa-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('asaworkspacecp7unwa-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/asaworkspacecp7unwa-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('asaworkspacecp7unwa-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('sqlpool01_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "asakeyvaultcp7unwa",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SQL-USER-ASA"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asakeyvaultcp7unwa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool01_highperf')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('sqlpool01_highperf_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "asakeyvaultcp7unwa",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SQL-USER-ASA"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asakeyvaultcp7unwa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool01_import01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('sqlpool01_import01_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "asakeyvaultcp7unwa",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SQL-USER-ASA"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asakeyvaultcp7unwa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool01_workload01')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('sqlpool01_workload01_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "asakeyvaultcp7unwa",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SQL-USER-ASA"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asakeyvaultcp7unwa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool01_workload02')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('sqlpool01_workload02_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "asakeyvaultcp7unwa",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "SQL-USER-ASA"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/asakeyvaultcp7unwa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureIntegrationRuntime01')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "MemoryOptimized",
+							"coreCount": 16,
+							"timeToLive": 60
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Column Level Security')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "    /*  Column-level security feature in Azure Synapse simplifies the design and coding of security in application.\r\n        It ensures column level security by restricting column access to protect sensitive data. */\r\n\r\n    /* Scenario: In this scenario we will be working with two users. The first one is the CEO, he has access to all\r\n        data. The second one is DataAnalystMiami, this user doesn't have access to the confidential Revenue column\r\n        in the Sales table. Follow this lab, one step at a time to see how Column-level security removes access to the\r\n        Revenue column to DataAnalystMiami */\r\n\r\n    --Step 1: Let us see how this feature in Azure Synapse works. Before that let us have a look at the Campaign table.\r\n    select  Top 100 * from wwi_Security.Sale\r\n    where City is not null and state is not null\r\n\r\n    /*  Consider a scenario where there are two users.\r\n        A CEO, who is an authorized  personnel with access to all the information in the database\r\n        and a Data Analyst, to whom only required information should be presented.*/\r\n\r\n    -- Step:2 Verify the existence of the 'CEO' and 'DataAnalystMiami' users in the Datawarehouse.\r\n    SELECT Name as [User1] FROM sys.sysusers WHERE name = N'CEO';\r\n    SELECT Name as [User2] FROM sys.sysusers WHERE name = N'DataAnalystMiami';\r\n\r\n\r\n    -- Step:3 Now let us enforce column level security for the DataAnalystMiami.\r\n    /*  The Sales table in the warehouse has information like ProductID, Analyst, Product, CampaignName, Quantity, Region, State, City, RevenueTarget and Revenue.\r\n        The Revenue generated from every campaign is classified and should be hidden from DataAnalystMiami.\r\n    */\r\n\r\n    REVOKE SELECT ON wwi_security.Sale FROM DataAnalystMiami;\r\n    GRANT SELECT ON wwi_security.Sale([ProductID], [Analyst], [Product], [CampaignName],[Quantity], [Region], [State], [City], [RevenueTarget]) TO DataAnalystMiami;\r\n    -- This provides DataAnalystMiami access to all the columns of the Sale table but Revenue.\r\n\r\n    -- Step:4 Then, to check if the security has been enforced, we execute the following query with current User As 'DataAnalystMiami', this will result in an error\r\n    --  since DataAnalystMiami doesn't have select access to the Revenue column\r\n    EXECUTE AS USER ='DataAnalystMiami';\r\n    select TOP 100 * from wwi_security.Sale;\r\n    ---\r\n    -- The following query will succeed since we are not including the Revenue column in the query.\r\n    EXECUTE AS USER ='DataAnalystMiami';\r\n    select [ProductID], [Analyst], [Product], [CampaignName],[Quantity], [Region], [State], [City], [RevenueTarget] from wwi_security.Sale;\r\n    \r\n    -- Step:5 Whereas, the CEO of the company should be authorized with all the information present in the warehouse.To do so, we execute the following query.\r\n    Revert;\r\n    GRANT SELECT ON wwi_security.Sale TO CEO;  --Full access to all columns.\r\n\r\n    -- Step:6 Let us check if our CEO user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\r\n    EXECUTE AS USER ='CEO'\r\n    select * from wwi_security.Sale\r\n    Revert;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"name": "SQLPool01",
+						"type": "SqlPool"
+					}
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Data Warehouse Optimization')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT\r\n    FS.CustomerID\r\n    ,MIN(FS.Quantity) as MinQuantity\r\n    ,MAX(FS.Quantity) as MaxQuantity\r\n    ,AVG(FS.Price) as AvgPrice\r\n    ,AVG(FS.TotalAmount) as AvgTotalAmount\r\n    ,AVG(FS.ProfitAmount) as AvgProfitAmount\r\n    ,COUNT(DISTINCT FS.StoreId) as DistinctStores\r\nFROM\r\n    wwi_perf.Sale_Heap FS\r\nGROUP BY\r\n    FS.CustomerId",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"name": "SQLPool01",
+						"type": "SqlPool"
+					}
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Dynamic Data Masking')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "    -------------------------------------------------------------------------Dynamic Data Masking (DDM)----------------------------------------------------------------------------------------------------------\r\n    /*  Dynamic data masking helps prevent unauthorized access to sensitive data by enabling customers\r\n        to designate how much of the sensitive data to reveal with minimal impact on the application layer.\r\n        Let see how */\r\n\r\n    /* Scenario: WWI has identified sensitive information in the CustomerInfo table. They would like us to \r\n        obfuscate the CreditCard and Email columns of the CustomerInfo table to DataAnalysts */\r\n\r\n    -- Step:1 Let us first get a view of CustomerInfo table.\r\n    SELECT TOP (100) * FROM wwi_security.CustomerInfo;\r\n\r\n    -- Step:2 Let's confirm that there are no Dynamic Data Masking (DDM) applied on columns.\r\n    SELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \r\n    FROM sys.masked_columns AS c  \r\n    JOIN sys.tables AS tbl\r\n        ON c.[object_id] = tbl.[object_id]  \r\n    WHERE is_masked = 1\r\n        AND tbl.name = 'CustomerInfo';\r\n    -- No results returned verify that no data masking has been done yet.\r\n\r\n    -- Step:3 Now lets mask 'CreditCard' and 'Email' Column of 'CustomerInfo' table.\r\n    ALTER TABLE wwi_security.CustomerInfo  \r\n    ALTER COLUMN [CreditCard] ADD MASKED WITH (FUNCTION = 'partial(0,\"XXXX-XXXX-XXXX-\",4)');\r\n    GO\r\n    ALTER TABLE wwi_security.CustomerInfo\r\n    ALTER COLUMN Email ADD MASKED WITH (FUNCTION = 'email()');\r\n    GO\r\n    -- The columns are sucessfully masked.\r\n\r\n    -- Step:4 Let's see Dynamic Data Masking (DDM) applied on the two columns.\r\n    SELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \r\n    FROM sys.masked_columns AS c  \r\n    JOIN sys.tables AS tbl\r\n        ON c.[object_id] = tbl.[object_id]  \r\n    WHERE is_masked = 1\r\n        AND tbl.name ='CustomerInfo';\r\n\r\n    -- Step:5 Now, let us grant SELECT permission to 'DataAnalystMiami' on the 'CustomerInfo' table.\r\n   GRANT SELECT ON wwi_security.CustomerInfo TO DataAnalystMiami;  \r\n\r\n    -- Step:6 Logged in as  'DataAnalystMiami' let us execute the select query and view the result.\r\n    EXECUTE AS USER = 'DataAnalystMiami';  \r\n    SELECT * FROM wwi_security.CustomerInfo;\r\n\r\n    -- Step:7 Let us remove the data masking using UNMASK permission\r\n    GRANT UNMASK TO DataAnalystMiami;\r\n    EXECUTE AS USER = 'DataAnalystMiami';  \r\n    SELECT *\r\n    FROM wwi_security.CustomerInfo;\r\n    revert;\r\n    REVOKE UNMASK TO DataAnalystMiami;  \r\n\r\n    ----step:8 Reverting all the changes back to as it was.\r\n    ALTER TABLE wwi_security.CustomerInfo\r\n    ALTER COLUMN CreditCard DROP MASKED;\r\n    GO\r\n    ALTER TABLE wwi_security.CustomerInfo\r\n    ALTER COLUMN Email DROP MASKED;\r\n    GO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"name": "SQLPool01",
+						"type": "SqlPool"
+					}
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Row Level Security')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "/*\tRow level Security (RLS) in Azure Synapse enables us to use group membership to control access to rows in a table.\r\n\tAzure Synapse applies the access restriction every time the data access is attempted from any user. \r\n\tLet see how we can implement row level security in Azure Synapse.*/\r\n\r\n----------------------------------Row-Level Security (RLS), 1: Filter predicates------------------------------------------------------------------\r\n-- Step:1 The Sale table has two Analyst values: DataAnalystMiami and DataAnalystSanDiego. \r\n--     Each analyst has jurisdiction across a specific Region. DataAnalystMiami on the South East Region\r\n--      and DataAnalystSanDiego on the Far West region.\r\nSELECT DISTINCT Analyst, Region FROM wwi_security.Sale order by Analyst ;\r\n\r\n/* Scenario: WWI requires that an Analyst only see the data for their own data from their own region. The CEO should see ALL data.\r\n    In the Sale table, there is an Analyst column that we can use to filter data to a specific Analyst value. */\r\n\r\n/* We will define this filter using what is called a Security Predicate. This is an inline table-valued function that allows\r\n    us to evaluate additional logic, in this case determining if the Analyst executing the query is the same as the Analyst\r\n    specified in the Analyst column in the row. The function returns 1 (will return the row) when a row in the Analyst column is the same as the \r\n    user executing the query (@Analyst = USER_NAME()) or if the user executing the query is the CEO user (USER_NAME() = 'CEO')\r\n    whom has access to all data.\r\n*/\r\n\r\n-- Review any existing security predicates in the database\r\nSELECT * FROM sys.security_predicates\r\n\r\n--Step:2 Create a new Schema to hold the security predicate, then define the predicate function. It returns 1 (or True) when\r\n--  a row should be returned in the parent query.\r\nGO\r\n\r\nCREATE FUNCTION wwi_security.fn_securitypredicate(@Analyst AS sysname)  \r\n    RETURNS TABLE  \r\nWITH SCHEMABINDING  \r\nAS  \r\n    RETURN SELECT 1 AS fn_securitypredicate_result\r\n    WHERE @Analyst = USER_NAME() OR USER_NAME() = 'CEO'\r\nGO\r\n-- Now we define security policy that adds the filter predicate to the Sale table. This will filter rows based on their login name.\r\nCREATE SECURITY POLICY SalesFilter  \r\nADD FILTER PREDICATE wwi_security.fn_securitypredicate(Analyst)\r\nON wwi_security.Sale\r\nWITH (STATE = ON);\r\n\r\n------ Allow SELECT permissions to the Sale Table.------\r\nGRANT SELECT ON wwi_security.Sale TO CEO, DataAnalystMiami, DataAnalystSanDiego;\r\n\r\n-- Step:3 Let us now test the filtering predicate, by selecting data from the Sale table as 'DataAnalystMiami' user.\r\nEXECUTE AS USER = 'DataAnalystMiami' \r\nSELECT * FROM wwi_security.Sale;\r\nrevert;\r\n-- As we can see, the query has returned rows here Login name is DataAnalystMiami\r\n\r\n-- Step:4 Let us test the same for  'DataAnalystSanDiego' user.\r\nEXECUTE AS USER = 'DataAnalystSanDiego';\r\nSELECT * FROM wwi_security.Sale;\r\nrevert;\r\n-- RLS is working indeed.\r\n\r\n-- Step:5 The CEO should be able to see all rows in the table.\r\nEXECUTE AS USER = 'CEO';  \r\nSELECT * FROM wwi_security.Sale;\r\nrevert;\r\n-- And he can.\r\n\r\n--Step:6 To disable the security policy we just created above, we execute the following.\r\nALTER SECURITY POLICY SalesFilter  \r\nWITH (STATE = OFF);\r\n\r\nDROP SECURITY POLICY SalesFilter;\r\nDROP FUNCTION wwi_security.fn_securitypredicate;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"name": "SQLPool01",
+						"type": "SqlPool"
+					}
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Explore with Spark')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "SparkPool01",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 1,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "62faf527-2c0e-4c26-9de2-41a240889003"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/3fc74bb3-e13d-42b9-b8ba-49317b7be9a1/resourceGroups/data-engineering-synapse-cp7unwa/providers/Microsoft.Synapse/workspaces/asaworkspacecp7unwa/bigDataPools/SparkPool01",
+						"name": "SparkPool01",
+						"type": "Spark",
+						"endpoint": "https://asaworkspacecp7unwa.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					}
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"source": [
+							"# Exploring and fixing data with Synapse Spark\r\n",
+							"\r\n",
+							"In this task, you will use a Synapse Spark notebook to explore a few of the files in the **wwi-02/sale-poc** folder in the data lake. You will also use Python code to fix the issues with the **sale-20170502.csv** file.\r\n",
+							"\r\n",
+							"1. First, attach this notebook to the **SparkPool01** Spark pool.\r\n",
+							"2. In the code cell below, replace **asadatalake*SUFFIX*** `with the name of the primary data lake storage account associated with your Syanpse workspace. Then execute the cell by selecting the **Run cell** button that becomes visible when you select the cell.\r\n",
+							"\r\n",
+							"> **Note**: The cell may take some time to run because the spark cluster must be started."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"adls_account_name = 'asadatalakecp7unwa'"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"## Exploring files with Spark\r\n",
+							"\r\n",
+							"1. The first step in exploring data using Synapse Spark is to load a file from the data lake. For this, we'll use the **spark.read.load()** method of the **SparkSession** to load the **sale-20170501.csv** file into a [DataFrame](https://spark.apache.org/docs/2.2.0/sql-programming-guide.html#datasets-and-dataframes).\r\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# First, load the file `sale-20170501.csv` file, which we know from our previous exploration to be formatted correctly.\r\n",
+							"# Note the use of the `header` and `inferSchema` parameters. Header indicates the first row of the file contains column headers,\r\n",
+							"# and `inferSchema` instruct Spark to use data within the file to infer data types.\r\n",
+							"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170501.csv', format='csv', header=True, inferSchema=True)"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"## View the contents of the DataFrame\r\n",
+							"\r\n",
+							"With the data from the **sale-20170501.csv** file loaded into a data frame, we can now use various methods of a data frame to explore the properties of the data.\r\n",
+							"\r\n",
+							"1. Let's look at the data as it was imported. Execute the cell below to view and inspect the data in the data frame."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"TransactionId"
+									],
+									"values": [
+										"CustomerId"
+									],
+									"yLabel": "CustomerId",
+									"xLabel": "TransactionId",
+									"aggregation": "SUM",
+									"aggByBackend": false
+								},
+								"aggData": "{\"CustomerId\":{\"cdd2ed88-8aae-4295-884a-ac4d40c3c33c\":44,\"e067fc11-e07d-4517-bc93-f7dc4b44f35e\":18}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"2. Like we saw during exploration with the SQL on-demand capabilities of Azure Synapse, Spark allows us to view and query against the data contained within files. \r\n",
+							"\r\n",
+							"3. Now, use the **printSchema()** method of the data frame to view the results of using the **inferSchema** parameter when creating the data frame. Execute the cell below and observe the output."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Now, print the inferred schema. We will need this information below to help with the missing headers in the May 2, 2017 file.\r\n",
+							"df.printSchema()"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"4. The **printSchema** method outputs both field names and data types that are based on the Spark engine's evaluation of the data contained within each field.\r\n",
+							"\r\n",
+							"    > We can use this information later to help define the schema for the poorly formed **sale-20170502.csv** file. In addition to the field names and data types, we should note the number of features or columns contained in the file. In this case, note that there are 11 fields. That will be used to determine where to split the single row of data.\r\n",
+							"\r\n",
+							"5. As an example of further exploration we can do, run the cell below to create and display a new data frame that contains an ordered list of distinct Customer and Product Id pairings. We can use these types of functions to find invalid or empty values quickly in targeted fields."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [],
+									"values": [
+										"ProductId"
+									],
+									"yLabel": "ProductId",
+									"xLabel": "",
+									"aggregation": "SUM",
+									"aggByBackend": false
+								},
+								"aggData": "{\"ProductId\":{\"\":189206}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Create a new data frame containing a list of distinct CustomerId and ProductId values in descending order of the CustomerId.\r\n",
+							"df_distinct_products = df.select('CustomerId', 'ProductId').distinct().orderBy('CustomerId')\r\n",
+							"\r\n",
+							"# Display the first 100 rows of the resulting data frame.\r\n",
+							"display(df_distinct_products.limit(100))"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"6. Next, let's attempt to open and explore the **sale-20170502.csv** file using the **load()** method, as we did above."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Next, let's try to read in the May 2, 2017 file using the same `load()` method we used for the first file.\r\n",
+							"df = spark.read.load(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv', format='csv')\r\n",
+							"display(df.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"7. As we saw in T-SQL, we receive a similar error in Spark that the number of columns processed may have exceeded limit of 20480 columns. To work with the data in this file, we need to use more advanced methods, as you will see in the next section below.\n",
+							""
+						]
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"## Handling and fixing poorly formed CSV files\r\n",
+							"\r\n",
+							"> The steps below provide example code for fixing the poorly-formed CSV file, **sale-20170502.csv** we discovered during exploration of the files in the **wwi-02/sale-poc** folder. This is just one of many ways to handle \"fixing\" a poorly-formed CSV file using Spark.\r\n",
+							"\r\n",
+							"1. To \"fix\" the bad file, we need to take a programmatic approach, using Python to read in the contents of the file and then parse them to put them into the proper shape.\r\n",
+							"\r\n",
+							"    > To handle the data being in a single row, we can use the **textFile()** method of our **SparkContext** to read the file as a collection of rows into a resilient distributed dataset (RDD). This allows us to get around the errors around the number of columns because we are essentially getting a single string value stored in a single column.\r\n",
+							"\r\n",
+							"2. Execute the cell below to load the RDD with data from the file."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Import the NumPy library. NumPy is a python library used for working with arrays.\r\n",
+							"import numpy as np\r\n",
+							"\r\n",
+							"# Read the CSV file into a resilient distributed dataset (RDD) as a text file. This will read each row of the file into rows in an RDD.\r\n",
+							"rdd = sc.textFile(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502.csv')"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"3. With the data now stored in an RDD, we can access the first, and only, populated row in the RDD, and split that into individual fields. We know from our inspection of the file in Notepad++ that it all the fields are separated by a comma (,), so let's start by splitting on that to create an array of field values. Execute the cell below to create a data array."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Since we know there is only one row, grab the first row of the RDD and split in on the field delimiter (comma).\r\n",
+							"data = rdd.first().split(',')\r\n",
+							"\r\n",
+							"field_count = len(data)\r\n",
+							"# Print out the count of fields read into the array.\r\n",
+							"print(field_count)"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"4. By splitting the row on the field delimiter, we created an array of all the individual field values in the file, the count of which you can see above.\n",
+							"\n",
+							"5. Now, run the cell below to do a quick calculation on the expected number of rows that will be generated by parsing every 11 fields into a single row."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import math\r\n",
+							"\r\n",
+							"expected_row_count = math.floor(field_count / 11)\r\n",
+							"print(f'The expected row count is: {expected_row_count}')"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"6. Next, let's create an array to store the data associated with each \"row\".\r\n",
+							"\r\n",
+							"    > We will set the max_index to the number of columns that are expected in each row. We know from our exploration of other files in the **wwi-02/sale-poc** folder that they contain 11 columns, so that is the value we will set.\r\n",
+							"\r\n",
+							"7. In addition to setting variables, we will use the cell below to loop through the **data** array and assign every 11 values to a row. By doing this, we are able to \"split\" the data that was once a single row into appropriate rows containing the proper data and columns from the file.\r\n",
+							"\r\n",
+							"8. Execute the cell below to create an array of rows from the file data."
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Create an array to store the data associated with each \"row\". Set the max_index to the number of columns that are in each row. This is 11, which we noted above when viewing the schema of the May 1 file.\r\n",
+							"row_list = []\r\n",
+							"max_index = 11\r\n",
+							"\r\n",
+							"# Now, we are going to loop through the array of values extracted from the single row of the file and build rows consisting of 11 columns.\r\n",
+							"while max_index <= len(data):\r\n",
+							"    row = [data[i] for i in np.arange(max_index-11, max_index)]\r\n",
+							"    row_list.append(row)\r\n",
+							"\r\n",
+							"    max_index += 11\r\n",
+							"\r\n",
+							"print(f'The row array contains {len(row_list)} rows. The expected number of rows was {expected_row_count}.')"
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"9. The last thing we need to do to be able to work with the file data as rows is to read it into a Spark DataFrame. In the cell below, we use the **createDataFrame()** method to convert the **row_list** array into a data frame, which also adding names for the columns. Column names are based on the schema we observed in the well formatted files in the **wwi-02/sale-poc** directory.\r\n",
+							"\r\n",
+							"10. Execute the cell below to create a data frame containing row data from the file and then display the first 10 rows."
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"TransactionId"
+									],
+									"values": [
+										"TransactionId"
+									],
+									"yLabel": "TransactionId",
+									"xLabel": "TransactionId",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"TransactionId\":{\"5455a4b4-62bd-401a-b5c6-79ea24f30531\":5,\"a4116581-5aad-416a-b767-aefa516737b1\":5}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Finally, we can use the row_list we created above to create a DataFrame. We can add to this a schema parameter, which contains the column names we saw in the schema of the first file.\r\n",
+							"df_fixed = spark.createDataFrame(row_list,schema=['TransactionId', 'CustomerId', 'ProductId', 'Quantity', 'Price', 'TotalAmount', 'TransactionDateId', 'ProfitAmount', 'Hour', 'Minute', 'StoreId'])\r\n",
+							"display(df_fixed.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 14
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"## Write the \"fixed\" file into the data lake\r\n",
+							"\r\n",
+							"1. The last step we will take as part of our exploration and file fixing process is to write the data back into the data lake, so it can be ingested following the same process as the other files in the **wwi-02/sale-poc** folder.\r\n",
+							"\r\n",
+							"2. Execute the cell below to save the data frame into the data lake a series of files in a folder named **sale-20170502-fixed**.\r\n",
+							"\r\n",
+							"    > Note: Spark parallelizes workloads across worker nodes, so when saving files, you will notice they are saved as a collection \"part\" files, and not as a single file. While there are some libraries you can use to create a single file, it is helpful to get used to working with files generated via Spark notebooks as they are natively created.\r\n",
+							""
+						]
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"df_fixed.write.format('csv').option('header',True).mode('overwrite').option('sep',',').save(f'abfss://wwi-02@{adls_account_name}.dfs.core.windows.net/sale-poc/sale-20170502-fixed')"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "markdown",
+						"source": [
+							"## Inspect the fixed file in the data lake\r\n",
+							"\r\n",
+							"1. With the fixed file written to the data lake, you can quickly inpsect it to verify the files are now formatted properly. Select the **wwi-02** tab above to view the **sale-poc** folder.\r\n",
+							"2. Refresh the folder view (expand the **More** menu if necessary) and then open the **sale-20170502-fixed** folder.\r\n",
+							"3. In the **sale-20170502-fixed** folder, right-click the first file whose name begins with **part** and whose extension is **.csv** and select **Preview** from the context menu.\r\n",
+							"4. In the **Preview** dialog, verify you see the proper columns and that the data looks valid in each field.\r\n",
+							"\r\n",
+							"## Wrap-up\r\n",
+							"\r\n",
+							"Throughout this exercise, you used a Spark notebook to explore data stored within files in the data lake. You used Python code to extract data from a poorly formatted CSV file, assemble the data from that file into proper rows, and then write the \"fixed\" file back out into your data lake.\r\n",
+							"\r\n",
+							"You can now return to the lab guide to continue with the next section of Lab 2.\r\n",
+							""
+						]
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Hyperscale')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "SparkPool01",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 1,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "d4525213-d754-431e-bac3-02d70b090752"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"synapse_widget": {
+						"version": "0.1"
+					},
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/3fc74bb3-e13d-42b9-b8ba-49317b7be9a1/resourceGroups/data-engineering-synapse-cp7unwa/providers/Microsoft.Synapse/workspaces/asaworkspacecp7unwa/bigDataPools/SparkPool01",
+						"name": "SparkPool01",
+						"type": "Spark",
+						"endpoint": "https://asaworkspacecp7unwa.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"extraHeader": null
+					}
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"from hyperspace import *  \r\n",
+							"from com.microsoft.hyperspace import *\r\n",
+							"from com.microsoft.hyperspace.index import *\r\n",
+							"\r\n",
+							"# Disable BroadcastHashJoin, so Spark will use standard SortMergeJoin. Currently, Hyperspace indexes utilize SortMergeJoin to speed up query.\r\n",
+							"spark.conf.set(\"spark.sql.autoBroadcastJoinThreshold\", -1)\r\n",
+							"\r\n",
+							"# Replace the value below with the name of your primary ADLS Gen2 account for your Synapse workspace\r\n",
+							"datalake = 'asadatalakecp7unwa'\r\n",
+							"# asadatalakecp7unwa\r\n",
+							"\r\n",
+							"dfSales = spark.read.parquet(\"abfss://wwi-02@\" + datalake + \".dfs.core.windows.net/sale-small/Year=2019/Quarter=Q4/Month=12/*/*.parquet\")\r\n",
+							"dfSales.show(10)\r\n",
+							"\r\n",
+							"dfCustomers = spark.read.load(\"abfss://wwi-02@\" + datalake + \".dfs.core.windows.net/data-generators/generator-customer-clean.csv\", format=\"csv\", header=True)\r\n",
+							"dfCustomers.show(10)\r\n",
+							"\r\n",
+							"# Create an instance of Hyperspace\r\n",
+							"hyperspace = Hyperspace(spark)"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#create indexes: each one contains a name, a set of indexed columns and a set of included columns\r\n",
+							"indexConfigSales = IndexConfig(\"indexSALES\", [\"CustomerId\"], [\"TotalAmount\"])\r\n",
+							"indexConfigCustomers = IndexConfig(\"indexCUSTOMERS\", [\"CustomerId\"], [\"FullName\"])\r\n",
+							"\r\n",
+							"hyperspace.createIndex(dfSales, indexConfigSales)            # only create index once\r\n",
+							"hyperspace.createIndex(dfCustomers, indexConfigCustomers)    # only create index once\r\n",
+							"hyperspace.indexes().show()df1 = dfSales.filter(\"\"\"CustomerId = 6\"\"\").select(\"\"\"TotalAmount\"\"\")\r\n",
+							"df1.show()\r\n",
+							"df1.explain(True)"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df1 = dfSales.filter(\"\"\"CustomerId = 6\"\"\").select(\"\"\"TotalAmount\"\"\")\r\n",
+							"df1.show()\r\n",
+							"df1.explain(True)\r\n",
+							"\r\n",
+							""
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"Hyperspace.enable(spark)\r\n",
+							"df1 = dfSales.filter(\"\"\"CustomerId = 6\"\"\").select(\"\"\"TotalAmount\"\"\")\r\n",
+							"df1.show()\r\n",
+							"df1.explain(True)"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df1 = dfSales.filter(\"\"\"CustomerId = 6\"\"\").select(\"\"\"TotalAmount\"\"\")\r\n",
+							"\r\n",
+							"spark.conf.set(\"spark.hyperspace.explain.displayMode\", \"html\")\r\n",
+							"hyperspace.explain(df1, True, displayHTML)"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"eqJoin = dfSales.join(dfCustomers, dfSales.CustomerId == dfCustomers.CustomerId).select(dfSales.TotalAmount, dfCustomers.FullName)\r\n",
+							"\r\n",
+							"hyperspace.explain(eqJoin, True, displayHTML)"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Disable Hyperspace - Hyperspace rules no longer apply during query optimization. Disabling Hyperspace has no impact on created indexes because they remain intact\r\n",
+							"Hyperspace.disable(spark)\r\n",
+							"\r\n",
+							"hyperspace.deleteIndex(\"indexSALES\")\r\n",
+							"hyperspace.vacuumIndex(\"indexSALES\")\r\n",
+							"hyperspace.deleteIndex(\"indexCUSTOMERS\")\r\n",
+							"hyperspace.vacuumIndex(\"indexCUSTOMERS\")"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from notebookutils import mssparkutils\r\n",
+							"\r\n",
+							"#\r\n",
+							"# Microsoft Spark Utilities\r\n",
+							"#\r\n",
+							"# https://docs.microsoft.com/en-us/azure/synapse-analytics/spark/microsoft-spark-utilities?pivots=programming-language-python\r\n",
+							"#\r\n",
+							"\r\n",
+							"# Azure storage access info\r\n",
+							"blob_account_name = datalake\r\n",
+							"blob_container_name = 'wwi-02'\r\n",
+							"blob_relative_path = '/'\r\n",
+							"linkedServiceName = datalake\r\n",
+							"blob_sas_token = mssparkutils.credentials.getConnectionStringOrCreds(linkedServiceName)\r\n",
+							"\r\n",
+							"# Allow SPARK to access from Blob remotely\r\n",
+							"spark.conf.set('fs.azure.sas.%s.%s.blob.core.windows.net' % (blob_container_name, blob_account_name), blob_sas_token)\r\n",
+							"\r\n",
+							"files = mssparkutils.fs.ls('/')\r\n",
+							"for file in files:\r\n",
+							"    print(file.name, file.isDir, file.isFile, file.path, file.size)\r\n",
+							"\r\n",
+							"mssparkutils.fs.mkdirs('/SomeNewFolder')\r\n",
+							"\r\n",
+							"files = mssparkutils.fs.ls('/')\r\n",
+							"for file in files:\r\n",
+							"    print(file.name, file.isDir, file.isFile, file.path, file.size)"
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"attachments": null,
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Notebook 1')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "SparkPool01",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 1,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "1",
+						"spark.dynamicAllocation.maxExecutors": "1",
+						"spark.autotune.trackingId": "f1ac99f3-5bad-4623-aeb8-11d79e029524"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/3fc74bb3-e13d-42b9-b8ba-49317b7be9a1/resourceGroups/data-engineering-synapse-cp7unwa/providers/Microsoft.Synapse/workspaces/asaworkspacecp7unwa/bigDataPools/SparkPool01",
+						"name": "SparkPool01",
+						"type": "Spark",
+						"endpoint": "https://asaworkspacecp7unwa.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/SparkPool01",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "2.4",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28
+					}
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"df = spark.read.load('abfss://wwi-02@asadatalakecp7unwa.dfs.core.windows.net/sale-small/Year=2019/Quarter=Q4/Month=12/Day=20191231/sale-small-20191231-snappy.parquet', format='parquet')\r\n",
+							"display(df.limit(10))\r\n",
+							"\r\n",
+							"\r\n",
+							"datalake = 'asadatalakecp7unwa'topPurchases = (flat.select('visitorId','topProductPurchases_flat.productId','topProductPurchases_flat.itemsPurchasedLast12Months')\r\n",
+							"    .orderBy('visitorId'))\r\n",
+							"\r\n",
+							"topPurchases.show(100)"
+						],
+						"outputs": [],
+						"execution_count": 22
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df.printSchema()"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"from pyspark.sql import SparkSession\r\n",
+							"from pyspark.sql.types import *\r\n",
+							"from pyspark.sql.functions import *\r\n",
+							"\r\n",
+							"profitByDateProduct = (df.groupBy(\"TransactionDate\",\"ProductId\")\r\n",
+							"    .agg(\r\n",
+							"        sum(\"ProfitAmount\").alias(\"(sum)ProfitAmount\"),\r\n",
+							"        round(avg(\"Quantity\"), 4).alias(\"(avg)Quantity\"),\r\n",
+							"        sum(\"Quantity\").alias(\"(sum)Quantity\"))\r\n",
+							"    .orderBy(\"TransactionDate\"))\r\n",
+							"display(profitByDateProduct.limit(100))"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"df = (spark.read \\\r\n",
+							"        .option('inferSchema', 'true') \\\r\n",
+							"        .json('abfss://wwi-02@' + datalake + '.dfs.core.windows.net/online-user-profiles-02/*.json', multiLine=True)\r\n",
+							"    )\r\n",
+							"\r\n",
+							"df.printSchema()"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# create a view called user_profiles\r\n",
+							"df.createOrReplaceTempView(\"user_profiles\")"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql\r\n",
+							"\r\n",
+							"SELECT * FROM user_profiles LIMIT 10"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"from pyspark.sql.functions import udf, explode\r\n",
+							"\r\n",
+							"flat=df.select('visitorId',explode('topProductPurchases').alias('topProductPurchases_flat'))\r\n",
+							"flat.show(100)\r\n",
+							"topPurchases = (flat.select('visitorId','topProductPurchases_flat.productId','topProductPurchases_flat.itemsPurchasedLast12Months')\r\n",
+							"    .orderBy('visitorId'))\r\n",
+							"\r\n",
+							"topPurchases.show(100)"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Let's order by the number of items purchased in the last 12 months\r\n",
+							"sortedTopPurchases = topPurchases.orderBy(\"itemsPurchasedLast12Months\")\r\n",
+							"\r\n",
+							"display(sortedTopPurchases.limit(100))"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"topPurchases.orderBy(col(\"itemsPurchasedLast12Months\").desc())\r\n",
+							"display(topPurchases.limit(10))\r\n",
+							"groupedTopPurchases = (sortedTopPurchases.select(\"visitorId\")\r\n",
+							"    .groupBy(\"visitorId\")\r\n",
+							"    .agg(count(\"*\").alias(\"total\"))\r\n",
+							"    .orderBy(\"visitorId\") )\r\n",
+							"\r\n",
+							"display(groupedTopPurchases.limit(100))"
+						],
+						"outputs": [],
+						"execution_count": 15
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"groupedTopPurchases = (sortedTopPurchases.select(\"visitorId\",\"itemsPurchasedLast12Months\")\r\n",
+							"    .groupBy(\"visitorId\")\r\n",
+							"    .agg(sum(\"itemsPurchasedLast12Months\").alias(\"totalItemsPurchased\"))\r\n",
+							"    .orderBy(\"visitorId\") )\r\n",
+							"\r\n",
+							"display(groupedTopPurchases.limit(100))"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Integrating spark pools and sql pool"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Create a temporary view for top purchases so we can load from Scala\r\n",
+							"topPurchases.createOrReplaceTempView(\"top_purchases\")"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "scala"
+							}
+						},
+						"source": [
+							"%%spark\r\n",
+							"// Make sure the name of the dedcated SQL pool (SQLPool01 below) matches the name of your SQL pool.\r\n",
+							"val df = spark.sqlContext.sql(\"select * from top_purchases\")\r\n",
+							"df.write.synapsesql(\"SQLPool01.wwi.TopPurchases\", Constants.INTERNAL)"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"dfsales = spark.read.load('abfss://wwi-02@' + datalake + '.dfs.core.windows.net/sale-small/Year=2019/Quarter=Q4/Month=12/*/*.parquet', format='parquet')\r\n",
+							"display(dfsales.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "scala"
+							}
+						},
+						"source": [
+							"%%spark\r\n",
+							"// Make sure the name of the SQL pool (SQLPool01 below) matches the name of your SQL pool.\r\n",
+							"val df2 = spark.read.synapsesql(\"SQLPool01.wwi.TopPurchases\")\r\n",
+							"df2.createTempView(\"top_purchases_sql\")\r\n",
+							"\r\n",
+							"df2.head(10)\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 24
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"dfTopPurchasesFromSql = sqlContext.table(\"top_purchases_sql\")\r\n",
+							"\r\n",
+							"display(dfTopPurchasesFromSql.limit(10))"
+						],
+						"outputs": [],
+						"execution_count": 25
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"inner_join = dfsales.join(dfTopPurchasesFromSql,\r\n",
+							"    (dfsales.CustomerId == dfTopPurchasesFromSql.visitorId) & (dfsales.ProductId == dfTopPurchasesFromSql.productId))\r\n",
+							"\r\n",
+							"inner_join_agg = (inner_join.select(\"CustomerId\",\"TotalAmount\",\"Quantity\",\"itemsPurchasedLast12Months\",\"top_purchases_sql.productId\")\r\n",
+							"    .groupBy([\"CustomerId\",\"top_purchases_sql.productId\"])\r\n",
+							"    .agg(\r\n",
+							"        sum(\"TotalAmount\").alias(\"TotalAmountDecember\"),\r\n",
+							"        sum(\"Quantity\").alias(\"TotalQuantityDecember\"),\r\n",
+							"        sum(\"itemsPurchasedLast12Months\").alias(\"TotalItemsPurchasedLast12Months\"))\r\n",
+							"    .orderBy(\"CustomerId\") )\r\n",
+							"\r\n",
+							"display(inner_join_agg.limit(100))"
+						],
+						"outputs": [],
+						"execution_count": 26
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQLPool01')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"restorePointInTime": "0001-01-01T00:00:00",
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "northeurope"
+		}
+	]
+}
